@@ -25,6 +25,11 @@ app.get("/campgrounds", async (req, res) => {
   res.json(campgrounds);
 });
 
+app.get("/campgrounds/:id", async (req, res) => {
+  const campground = await Campground.findById(req.params.id);
+  res.json(campground);
+});
+
 const PORT = 1337;
 
 app.listen(PORT, () => {

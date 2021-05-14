@@ -1,38 +1,36 @@
-import React, { useState, useEffect } from "react";
-import "./App.css";
+import React from "react";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 
-import CampgroundsService from "./services/campgrounds.service";
-import { formatMoney } from "./utils/formatMoney";
+import CampgroundList from "./pages/campgrounds/CampgroundList";
+import Campground from "./pages/campgrounds/Campground";
 
 function App() {
-  const [campgrounds, setCampgrounds] = useState([]);
-
-  async function getCampgrounds() {
-    const res = await CampgroundsService.getAll();
-    setCampgrounds(res.data);
-  }
-
-  useEffect(() => {
-    getCampgrounds();
-  }, []);
-
   return (
-    <div className="App">
-      <h1>Campgrounds</h1>
-      <ul>
-        {campgrounds.map((campground) => (
-          <li>
-            <h2>
-              {campground.title} - {campground.location}
-            </h2>
-            <p>{formatMoney(campground.price)}</p>
-            <p>
-              <em>{campground.description}</em>
-            </p>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <Router>
+      <div>
+        <nav>
+          <ul>
+            <li>
+              <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="/campgrounds">Campgrounds</Link>
+            </li>
+          </ul>
+        </nav>
+
+        {/* A <Switch> looks through its children <Route>s and
+            renders the first one that matches the current URL. */}
+        <Switch>
+          <Route path="/campgrounds" exact>
+            <CampgroundList />
+          </Route>
+          <Route path="/campgrounds/:id" exact>
+            <Campground />
+          </Route>
+        </Switch>
+      </div>
+    </Router>
   );
 }
 
