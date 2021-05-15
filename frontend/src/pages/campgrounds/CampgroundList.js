@@ -21,7 +21,7 @@ function CampgroundList() {
       <h1>Campgrounds</h1>
       <ul>
         {campgrounds.map((campground) => (
-          <li>
+          <li key={campground._id}>
             <h2>
               <Link to={`/campgrounds/${campground._id}`}>
                 {campground.title} - {campground.location}

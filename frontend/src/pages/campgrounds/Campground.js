@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useHistory, useParams } from "react-router-dom";
 
 import CampgroundsService from "../../services/campgrounds.service";
 import { formatMoney } from "../../utils/formatMoney";
@@ -7,10 +7,16 @@ import { formatMoney } from "../../utils/formatMoney";
 function Campground() {
   const [campground, setCampground] = useState([]);
   const { id } = useParams();
+  const history = useHistory();
 
   async function getCampground(id) {
     const res = await CampgroundsService.get(id);
     setCampground(res.data);
+  }
+
+  async function deleteCampground(id) {
+    await CampgroundsService.delete(id);
+    history.push("/campgrounds");
   }
 
   useEffect(() => {
@@ -27,6 +33,9 @@ function Campground() {
       <p>
         <em>{campground.description}</em>
       </p>
+
+      <Link to={`/campgrounds/${id}/edit`}>Edit</Link>
+      <button onClick={() => deleteCampground(id)}>Delete</button>
     </div>
   );
 }

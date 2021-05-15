@@ -30,6 +30,36 @@ app.get("/campgrounds/:id", async (req, res) => {
   res.json(campground);
 });
 
+app.post("/campgrounds", async (req, res) => {
+  try {
+    const campground = new Campground(req.body.campground);
+    await campground.save();
+    res.json({ status: "success" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put("/campgrounds/:id", async (req, res) => {
+  try {
+    await Campground.findByIdAndUpdate(req.params.id, {
+      ...req.body.campground,
+    });
+    res.json({ status: "success" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete("/campgrounds/:id", async (req, res) => {
+  try {
+    await Campground.findByIdAndDelete(req.params.id);
+    res.json({ status: "success" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 const PORT = 1337;
 
 app.listen(PORT, () => {
