@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
 import HomePage from "./pages/HomePage";
 import CampgroundList from "./pages/campgrounds/CampgroundList";
@@ -7,11 +7,13 @@ import Campground from "./pages/campgrounds/Campground";
 import NewCampground from "./pages/campgrounds/NewCampground";
 import EditCampground from "./pages/campgrounds/EditCampground";
 
+import Header from "./components/layout/Header";
+
 function App() {
   return (
     <Router>
       <div>
-        <nav>
+        {/* <nav>
           <ul>
             <li>
               <Link to="/">Home</Link>
@@ -23,7 +25,8 @@ function App() {
               <Link to="/campgrounds/new">New Campground</Link>
             </li>
           </ul>
-        </nav>
+        </nav> */}
+        <Header />
 
         {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}

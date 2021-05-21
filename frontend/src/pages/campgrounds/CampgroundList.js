@@ -17,12 +17,12 @@ function CampgroundList() {
   }, []);
 
   return (
-    <div className="App">
-      <h1>Campgrounds</h1>
+    <div>
+      <h1 className="text-3xl font-bold py-5">Campgrounds</h1>
       <ul>
         {campgrounds.map((campground) => (
-          <li key={campground._id}>
-            <h2>
+          <li className="py-2" key={campground._id}>
+            <h2 className="font-bold text-xl">
               <Link to={`/campgrounds/${campground._id}`}>
                 {campground.title} - {campground.location}
               </Link>
