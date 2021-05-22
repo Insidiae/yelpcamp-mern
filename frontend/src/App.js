@@ -8,24 +8,12 @@ import NewCampground from "./pages/campgrounds/NewCampground";
 import EditCampground from "./pages/campgrounds/EditCampground";
 
 import Header from "./components/layout/Header";
+import Footer from "./components/layout/Footer";
 
 function App() {
   return (
     <Router>
-      <div>
-        {/* <nav>
-          <ul>
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/campgrounds">Campgrounds</Link>
-            </li>
-            <li>
-              <Link to="/campgrounds/new">New Campground</Link>
-            </li>
-          </ul>
-        </nav> */}
+      <div className="flex flex-col min-h-screen  bg-gray-200">
         <Header />
 
         {/* A <Switch> looks through its children <Route>s and
@@ -47,6 +35,8 @@ function App() {
             <EditCampground />
           </Route>
         </Switch>
+
+        <Footer />
       </div>
     </Router>
   );
