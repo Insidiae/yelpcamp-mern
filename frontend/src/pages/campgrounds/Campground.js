@@ -5,13 +5,18 @@ import CampgroundsService from "../../services/campgrounds.service";
 import { formatMoney } from "../../utils/formatMoney";
 
 function Campground() {
-  const [campground, setCampground] = useState([]);
+  const [campground, setCampground] = useState(null);
+  const [error, setError] = useState(null);
   const { id } = useParams();
   const history = useHistory();
 
   async function getCampground(id) {
-    const res = await CampgroundsService.get(id);
-    setCampground(res.data);
+    try {
+      const res = await CampgroundsService.get(id);
+      setCampground(res.data);
+    } catch (err) {
+      setError(err.response.data);
+    }
   }
 
   async function deleteCampground(id) {
@@ -22,6 +27,22 @@ function Campground() {
   useEffect(() => {
     getCampground(id);
   }, [id]);
+
+  useEffect(() => {
+    document.title = `${campground && campground.name} | YelpCamp`;
+  }, [campground]);
+
+  useEffect(() => {
+    document.title = `${error && error.errorMsg} | YelpCamp`;
+  }, [error]);
+
+  if (!error && !campground) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error.errorMsg}</div>;
+  }
 
   return (
     <div className="flex flex-col justify-center items-center min-h-full">

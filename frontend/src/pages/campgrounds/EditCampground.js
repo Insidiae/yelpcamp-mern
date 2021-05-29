@@ -1,42 +1,54 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { Link, useHistory, useParams } from "react-router-dom";
+import { useForm } from "react-hook-form";
 
 import CampgroundsService from "../../services/campgrounds.service";
 
 function EditCampground() {
   const { id } = useParams();
   const history = useHistory();
-  const [name, setName] = useState("");
-  const [image, setImage] = useState("");
-  const [price, setPrice] = useState(0);
-  const [description, setDescription] = useState("");
-  const [location, setLocation] = useState("");
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+    setValue,
+  } = useForm();
 
-  async function getCampgroundData(id) {
+  //TODO: Research the proper way to set values in edit form.
+  //? This one throws an exhaustive-deps warning
+  //? when passed into useEffect.
+  // async function getCampgroundData(id) {
+  //   const res = await CampgroundsService.get(id);
+  //   setValue("name", res.data.name);
+  //   setValue("image", res.data.image);
+  //   setValue("price", res.data.price / 100);
+  //   setValue("description", res.data.description);
+  //   setValue("location", res.data.location);
+  // }
+
+  //? ESLint suggest using useCallback to get rid of the
+  //? exhaustive-deps warning, but this still feels iffy.
+  const getCampgroundData = useCallback(async () => {
     const res = await CampgroundsService.get(id);
-    setName(res.data.name);
-    setImage(res.data.image);
-    setPrice(res.data.price / 100);
-    setDescription(res.data.description);
-    setLocation(res.data.location);
-  }
+    setValue("name", res.data.name);
+    setValue("image", res.data.image);
+    setValue("price", res.data.price / 100);
+    setValue("description", res.data.description);
+    setValue("location", res.data.location);
+  }, [id, setValue]);
 
+  //? The setValue calls seem to be the one throwing
+  //? the exhaustive-deps warning, meaning I have to add
+  //? getCampgroundData into the dependency list now.
   useEffect(() => {
+    document.title = "Edit Campground | YelpCamp";
     getCampgroundData(id);
-  }, [id]);
+  }, [id, getCampgroundData]);
 
-  async function handleSubmit(e) {
-    e.preventDefault();
+  async function onSubmit(data) {
+    data.price = data.price * 100;
 
-    const campground = {
-      name: name,
-      image,
-      price: price * 100,
-      description,
-      location,
-    };
-
-    await CampgroundsService.edit(id, { campground });
+    await CampgroundsService.edit(id, { campground: data });
 
     history.push(`/campgrounds/${id}`);
   }
@@ -45,8 +57,8 @@ function EditCampground() {
     <div className="flex flex-col justify-center items-center min-h-full">
       <h1 className="text-3xl font-bold py-5">Edit Campground</h1>
       <form
-        onSubmit={handleSubmit}
-        className="flex flex-col bg-white border-2 border-gray-300 my-4 p-5 rounded-md tracking-wide shadow-lg w-1/2"
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col bg-white border-2 border-gray-300 my-4 p-5 rounded-md tracking-wide shadow-lg w-4/5 sm:w-1/2"
       >
         <div className="my-2">
           <label
@@ -59,11 +71,17 @@ function EditCampground() {
             type="text"
             name="name"
             id="name"
-            className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+            className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
+              errors.name && "ring-red-500 border-red-500"
+            }`}
             placeholder="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            {...register("name", { required: true })}
           />
+          {errors.name && (
+            <span className="text-red-500 font-semibold sm:text-sm">
+              Please enter a name.
+            </span>
+          )}
         </div>
         <div className="my-2">
           <label
@@ -76,11 +94,17 @@ function EditCampground() {
             type="text"
             name="image"
             id="image"
-            className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+            className={`focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
+              errors.image && "ring-red-500 border-red-500"
+            }`}
             placeholder="Image URL"
-            value={image}
-            onChange={(e) => setImage(e.target.value)}
+            {...register("image", { required: true })}
           />
+          {errors.image && (
+            <span className="text-red-500 font-semibold sm:text-sm">
+              Please enter an image URL.
+            </span>
+          )}
         </div>
         <div className="my-2">
           <label
@@ -97,14 +121,20 @@ function EditCampground() {
               type="number"
               name="price"
               id="price"
-              className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-r-md sm:text-sm border-gray-300"
+              className={`focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-r-md sm:text-sm border-gray-300 ${
+                errors.price && "ring-red-500 border-red-500"
+              }`}
               placeholder="Price"
               step="0.01"
               min="0"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
+              {...register("price", { required: true })}
             />
           </div>
+          {errors.price && (
+            <span className="text-red-500 font-semibold sm:text-sm">
+              Please enter a valid price.
+            </span>
+          )}
         </div>
         <div className="my-2">
           <label
@@ -117,11 +147,17 @@ function EditCampground() {
             name="description"
             id="description"
             rows={3}
-            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border-gray-300 rounded-md"
+            className={`shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border-gray-300 rounded-md ${
+              errors.description && "ring-red-500 border-red-500"
+            }`}
             placeholder="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            {...register("description", { required: true })}
           />
+          {errors.description && (
+            <span className="text-red-500 font-semibold sm:text-sm">
+              Please enter a description.
+            </span>
+          )}
         </div>
         <div className="my-2">
           <label
@@ -134,22 +170,28 @@ function EditCampground() {
             type="text"
             name="location"
             id="location"
-            className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+            className={`focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
+              errors.location && "ring-red-500 border-red-500"
+            }`}
             placeholder="Location"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
+            {...register("location", { required: true })}
           />
+          {errors.location && (
+            <span className="text-red-500 font-semibold sm:text-sm">
+              Please enter a valid location.
+            </span>
+          )}
         </div>
 
         <div className="my-2">
           <button
             type="submit"
-            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             Submit
           </button>
           <Link
-            to={`/campgrounds/${id}`}
+            to="/campgrounds"
             className="inline-flex justify-center py-2 px-4 border border-transparent text-sm font-medium text-blue-600 bg-transparent hover:text-blue-700"
           >
             Cancel

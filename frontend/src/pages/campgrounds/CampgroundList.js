@@ -13,21 +13,22 @@ function CampgroundList() {
   }
 
   useEffect(() => {
+    document.title = "Campgrounds | YelpCamp";
     getCampgrounds();
   }, []);
 
   return (
     <div className="flex flex-col items-center min-h-screen py-4">
       <h1 className="text-3xl font-bold py-5">Campgrounds</h1>
-      <ul>
+      <ul className="flex flex-col items-center">
         {campgrounds.map((campground) => (
           <li
-            className="flex justify-start items-center max-w-2xl bg-white border-2 border-gray-300 my-4 p-5 rounded-md tracking-wide shadow-lg"
+            className="flex justify-start items-center w-10/12 sm:w-1/2 bg-white border-2 border-gray-300 my-4 p-5 rounded-md tracking-wide shadow-lg"
             key={campground._id}
           >
             <div className="flex">
               <img
-                className="w-48 rounded-md border-2 object-cover border-gray-300"
+                className="w-1/2 rounded-md border-2 object-cover border-gray-300"
                 src={campground.image}
                 alt={campground.name}
               />

@@ -6,6 +6,7 @@ import CampgroundList from "./pages/campgrounds/CampgroundList";
 import Campground from "./pages/campgrounds/Campground";
 import NewCampground from "./pages/campgrounds/NewCampground";
 import EditCampground from "./pages/campgrounds/EditCampground";
+import NotFound from "./pages/NotFound";
 
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
@@ -33,6 +34,9 @@ function App() {
           </Route>
           <Route path="/campgrounds/:id/edit" exact>
             <EditCampground />
+          </Route>
+          <Route>
+            <NotFound />
           </Route>
         </Switch>
 
