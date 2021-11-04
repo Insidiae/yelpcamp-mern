@@ -10,6 +10,7 @@ import { StarIcon as SolidStar } from "@heroicons/react/solid";
 import CampgroundsService from "../../services/campgrounds.service";
 import ReviewsService from "../../services/reviews.service";
 import NewReview from "../../components/reviews/NewReview";
+import NotFound from "../NotFound";
 
 import { formatMoney } from "../../utils/formatMoney";
 
@@ -46,16 +47,12 @@ function Campground() {
     document.title = `${campground && campground.name} | YelpCamp`;
   }, [campground]);
 
-  useEffect(() => {
-    document.title = `${error && error.errorMsg} | YelpCamp`;
-  }, [error]);
-
   if (!error && !campground) {
     return <div>Loading...</div>;
   }
 
   if (error) {
-    return <div>{error.errorMsg}</div>;
+    return <NotFound />;
   }
 
   return (
