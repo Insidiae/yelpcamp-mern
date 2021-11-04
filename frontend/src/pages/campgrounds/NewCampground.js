@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
 import CampgroundsService from "../../services/campgrounds.service";
 
 function NewCampground() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const {
     register,
     formState: { errors },
@@ -21,7 +21,7 @@ function NewCampground() {
 
     await CampgroundsService.create({ campground: data });
 
-    history.push("/campgrounds");
+    navigate("/campgrounds");
   }
 
   return (

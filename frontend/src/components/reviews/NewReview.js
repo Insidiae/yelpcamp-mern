@@ -1,11 +1,11 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
 import ReviewsService from "../../services/reviews.service";
 
 function NewReview({ campgroundId }) {
-  const history = useHistory();
+  const navigate = useNavigate();
   const {
     register,
     formState: { errors },
@@ -15,7 +15,7 @@ function NewReview({ campgroundId }) {
   async function onSubmit(data) {
     await ReviewsService.create(campgroundId, { review: data });
 
-    history.go(0);
+    navigate(0);
   }
 
   return (

@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import HomePage from "./pages/HomePage";
 import CampgroundList from "./pages/campgrounds/CampgroundList";
@@ -19,26 +19,16 @@ function App() {
 
         {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}
-        <Switch>
-          <Route path="/" exact>
-            <HomePage />
-          </Route>
-          <Route path="/campgrounds" exact>
-            <CampgroundList />
-          </Route>
-          <Route path="/campgrounds/new" exact>
-            <NewCampground />
-          </Route>
-          <Route path="/campgrounds/:id" exact>
-            <Campground />
-          </Route>
-          <Route path="/campgrounds/:id/edit" exact>
-            <EditCampground />
-          </Route>
-          <Route>
-            <NotFound />
-          </Route>
-        </Switch>
+        <main>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/campgrounds" element={<CampgroundList />} />
+            <Route path="/campgrounds/new" element={<NewCampground />} />
+            <Route path="/campgrounds/:id" element={<Campground />} />
+            <Route path="/campgrounds/:id/edit" element={<EditCampground />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </main>
 
         <Footer />
       </div>

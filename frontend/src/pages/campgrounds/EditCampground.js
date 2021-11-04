@@ -1,12 +1,12 @@
 import React, { useEffect, useCallback } from "react";
-import { Link, useHistory, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
 import CampgroundsService from "../../services/campgrounds.service";
 
 function EditCampground() {
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const {
     register,
     formState: { errors },
@@ -50,7 +50,7 @@ function EditCampground() {
 
     await CampgroundsService.edit(id, { campground: data });
 
-    history.push(`/campgrounds/${id}`);
+    navigate(`/campgrounds/${id}`);
   }
 
   return (

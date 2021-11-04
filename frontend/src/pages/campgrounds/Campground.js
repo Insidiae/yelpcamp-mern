@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useHistory, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   LocationMarkerIcon,
   TrashIcon,
@@ -17,7 +17,7 @@ function Campground() {
   const [campground, setCampground] = useState(null);
   const [error, setError] = useState(null);
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   async function getCampground(id) {
     try {
@@ -30,12 +30,12 @@ function Campground() {
 
   async function deleteCampground(id) {
     await CampgroundsService.delete(id);
-    history.push("/campgrounds");
+    navigate("/campgrounds");
   }
 
   async function deleteReview(campgroundId, reviewId) {
     await ReviewsService.delete(campgroundId, reviewId);
-    history.go(0);
+    navigate(0);
   }
 
   useEffect(() => {
