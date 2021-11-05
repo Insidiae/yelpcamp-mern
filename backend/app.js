@@ -2,16 +2,13 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const cors = require("cors");
+const session = require("express-session");
 
-const { campgroundSchema, reviewSchema } = require("./schemas");
+const campgroundsRoutes = require("./routes/campgrounds");
+const reviewsRoutes = require("./routes/reviews");
 
-const Campground = require("./models/campground");
-const Review = require("./models/review");
-
-const catchAsync = require("./utils/catchAsync");
-const ExpressError = require("./utils/ExpressError");
-
-app.use(cors());
+//! Might wanna change this when we deploy
+app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 app.use(express.json());
 
 mongoose
@@ -23,102 +20,20 @@ mongoose
     console.error(err);
   });
 
-const validateCampground = (req, res, next) => {
-  const { error } = campgroundSchema.validate(req.body);
-  if (error) {
-    const msg = error.details.map((el) => el.message).join(",");
-    throw new ExpressError(400, msg);
-  } else {
-    next();
-  }
+const sessionOptions = {
+  secret: "thisshouldbeabettersecret!",
+  resave: false,
+  saveUnitialized: true,
+  cookie: {
+    httpOnly: true,
+    expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+  },
 };
+app.use(session(sessionOptions));
 
-const validateReview = (req, res, next) => {
-  const { error } = reviewSchema.validate(req.body);
-  if (error) {
-    const msg = error.details.map((el) => el.message).join(",");
-    throw new ExpressError(400, msg);
-  } else {
-    next();
-  }
-};
-
-app.get(
-  "/campgrounds",
-  catchAsync(async (req, res) => {
-    const campgrounds = await Campground.find({});
-    res.json(campgrounds);
-  })
-);
-
-app.get(
-  "/campgrounds/:id",
-  catchAsync(async (req, res, next) => {
-    const campground = await Campground.findById(req.params.id).populate(
-      "reviews"
-    );
-    if (!campground) {
-      throw new ExpressError(404, "Campground not Found");
-    }
-    res.json(campground);
-  })
-);
-
-app.post(
-  "/campgrounds",
-  validateCampground,
-  catchAsync(async (req, res, next) => {
-    const campground = new Campground(req.body.campground);
-    await campground.save();
-    res.json({ status: "success" });
-  })
-);
-
-app.put(
-  "/campgrounds/:id",
-  validateCampground,
-  catchAsync(async (req, res, next) => {
-    await Campground.findByIdAndUpdate(req.params.id, {
-      ...req.body.campground,
-    });
-    res.json({ status: "success" });
-  })
-);
-
-app.delete(
-  "/campgrounds/:id",
-  catchAsync(async (req, res, next) => {
-    await Campground.findByIdAndDelete(req.params.id);
-    res.json({ status: "success" });
-  })
-);
-
-app.post(
-  "/campgrounds/:id/reviews",
-  validateReview,
-  catchAsync(async (req, res, next) => {
-    const campground = await Campground.findById(req.params.id);
-    const review = new Review(req.body.review);
-    campground.reviews.push(review);
-
-    const saveReview = review.save();
-    const saveCampground = campground.save();
-    await Promise.all([saveReview, saveCampground]);
-    res.json({ status: "success" });
-  })
-);
-
-app.delete(
-  "/campgrounds/:campgroundId/reviews/:reviewId",
-  catchAsync(async (req, res, next) => {
-    const { campgroundId, reviewId } = req.params;
-    await Campground.findByIdAndUpdate(campgroundId, {
-      $pull: { reviews: reviewId },
-    });
-    await Review.findByIdAndDelete(reviewId);
-    res.json({ status: "success" });
-  })
-);
+app.use("/campgrounds", campgroundsRoutes);
+app.use("/campgrounds/:campgroundId/reviews", reviewsRoutes);
 
 app.use((err, req, res, next) => {
   const { status = 500, message = "Something went wrong :(" } = err;

@@ -15,6 +15,9 @@ function NewReview({ campgroundId }) {
   async function onSubmit(data) {
     await ReviewsService.create(campgroundId, { review: data });
 
+    navigate(`/campgrounds/${campgroundId}`, {
+      state: { type: "success", message: "Your review has been posted!" },
+    });
     navigate(0);
   }
 

@@ -50,7 +50,10 @@ function EditCampground() {
 
     await CampgroundsService.edit(id, { campground: data });
 
-    navigate(`/campgrounds/${id}`);
+    navigate(`/campgrounds/${id}`, {
+      state: { type: "info", message: "Campground has been updated." },
+      replace: true,
+    });
   }
 
   return (

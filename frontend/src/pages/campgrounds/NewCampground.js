@@ -21,7 +21,9 @@ function NewCampground() {
 
     await CampgroundsService.create({ campground: data });
 
-    navigate("/campgrounds");
+    navigate("/campgrounds", {
+      state: { type: "success", message: "Added a new campground!" },
+    });
   }
 
   return (

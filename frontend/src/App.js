@@ -20,12 +20,11 @@ function App() {
         <main>
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/campgrounds" element={<CampgroundList />} />
-            <Route path="/campgrounds/*">
+            <Route path="/campgrounds">
+              <Route index element={<CampgroundList />} />
               <Route path="new" element={<NewCampground />} />
               <Route path=":id" element={<Campground />} />
               <Route path=":id/edit" element={<EditCampground />} />
-              <Route path="*" element={<NotFound />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
