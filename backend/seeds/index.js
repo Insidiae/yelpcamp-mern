@@ -4,17 +4,14 @@ const Campground = require("../models/campground");
 const cities = require("./cities");
 const { places, descriptors } = require("./seedHelpers");
 
-mongoose.connect("mongodb://127.0.0.1:27017/yelp-camp", {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useUnifiedTopology: true,
-});
-
-const db = mongoose.connection;
-db.on("error", console.error.bind(console, "Connection Error:"));
-db.once("open", () => {
-  console.log("Database connected!");
-});
+mongoose
+  .connect("mongodb://127.0.0.1:27017/yelp-camp")
+  .then(() => {
+    console.log("Database connected!");
+  })
+  .catch((err) => {
+    console.error(err);
+  });
 
 const sample = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
@@ -29,6 +26,7 @@ const seedDB = async () => {
       description:
         "Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam delectus odio eligendi quasi.",
       location: `${cities[random1000].city}, ${cities[random1000].state}`,
+      author: "61880c2ad3ca744b5d0ea878",
     });
     await c.save();
   }

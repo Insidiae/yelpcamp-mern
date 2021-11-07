@@ -1,22 +1,15 @@
 const express = require("express");
 const router = express.Router();
 
-const { campgroundSchema } = require("../schemas");
-
 const Campground = require("../models/campground");
 
+const {
+  isLoggedIn,
+  authorizeCampground,
+  validateCampground,
+} = require("../middleware");
 const catchAsync = require("../utils/catchAsync");
 const ExpressError = require("../utils/ExpressError");
-
-const validateCampground = (req, res, next) => {
-  const { error } = campgroundSchema.validate(req.body);
-  if (error) {
-    const msg = error.details.map((el) => el.message).join(",");
-    throw new ExpressError(400, msg);
-  } else {
-    next();
-  }
-};
 
 router.get(
   "/",
@@ -29,9 +22,9 @@ router.get(
 router.get(
   "/:id",
   catchAsync(async (req, res, next) => {
-    const campground = await Campground.findById(req.params.id).populate(
-      "reviews"
-    );
+    const campground = await Campground.findById(req.params.id)
+      .populate({ path: "reviews", populate: { path: "author" } })
+      .populate("author");
     if (!campground) {
       throw new ExpressError(404, "Campground not Found");
     }
@@ -41,9 +34,11 @@ router.get(
 
 router.post(
   "/",
+  isLoggedIn,
   validateCampground,
   catchAsync(async (req, res, next) => {
     const campground = new Campground(req.body.campground);
+    campground.author = req.user._id;
     await campground.save();
     res.json({ status: "success" });
   })
@@ -51,9 +46,12 @@ router.post(
 
 router.put(
   "/:id",
+  isLoggedIn,
   validateCampground,
+  authorizeCampground,
   catchAsync(async (req, res, next) => {
-    await Campground.findByIdAndUpdate(req.params.id, {
+    const { id } = req.params;
+    await Campground.findByIdAndUpdate(id, {
       ...req.body.campground,
     });
     res.json({ status: "success" });
@@ -62,6 +60,8 @@ router.put(
 
 router.delete(
   "/:id",
+  isLoggedIn,
+  authorizeCampground,
   catchAsync(async (req, res, next) => {
     await Campground.findByIdAndDelete(req.params.id);
     res.json({ status: "success" });

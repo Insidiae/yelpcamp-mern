@@ -1,11 +1,13 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useContext } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
 import CampgroundsService from "../../services/campgrounds.service";
+import { AuthContext } from "../../services/auth.context";
 
 function EditCampground() {
   const { id } = useParams();
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const {
     register,
@@ -30,12 +32,21 @@ function EditCampground() {
   //? exhaustive-deps warning, but this still feels iffy.
   const getCampgroundData = useCallback(async () => {
     const res = await CampgroundsService.get(id);
+    if (res.data.author._id !== user?._id) {
+      navigate(`/campgrounds/${id}`, {
+        state: {
+          type: "danger",
+          message: "You do not have the permision to edit this campground.",
+        },
+        replace: true,
+      });
+    }
     setValue("name", res.data.name);
     setValue("image", res.data.image);
     setValue("price", res.data.price / 100);
     setValue("description", res.data.description);
     setValue("location", res.data.location);
-  }, [id, setValue]);
+  }, [id, setValue, navigate, user]);
 
   //? The setValue calls seem to be the one throwing
   //? the exhaustive-deps warning, meaning I have to add

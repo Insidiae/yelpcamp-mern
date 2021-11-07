@@ -3,7 +3,12 @@ const app = express();
 const mongoose = require("mongoose");
 const cors = require("cors");
 const session = require("express-session");
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
 
+const User = require("./models/user");
+
+const usersRoutes = require("./routes/users");
 const campgroundsRoutes = require("./routes/campgrounds");
 const reviewsRoutes = require("./routes/reviews");
 
@@ -32,6 +37,14 @@ const sessionOptions = {
 };
 app.use(session(sessionOptions));
 
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+app.use("/", usersRoutes);
 app.use("/campgrounds", campgroundsRoutes);
 app.use("/campgrounds/:campgroundId/reviews", reviewsRoutes);
 

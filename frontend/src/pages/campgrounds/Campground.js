@@ -1,11 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
-import {
-  LocationMarkerIcon,
-  TrashIcon,
-  StarIcon as EmptyStar,
-} from "@heroicons/react/outline";
-import { StarIcon as SolidStar } from "@heroicons/react/solid";
+import { LocationMarkerIcon, TrashIcon } from "@heroicons/react/outline";
+import { StarIcon } from "@heroicons/react/solid";
 
 import CampgroundsService from "../../services/campgrounds.service";
 import ReviewsService from "../../services/reviews.service";
@@ -13,10 +9,13 @@ import ReviewsService from "../../services/reviews.service";
 import Flash from "../../components/flash";
 import NewReview from "../../components/reviews/NewReview";
 
+import { AuthContext } from "../../services/auth.context";
+
 import { formatMoney } from "../../utils/formatMoney";
 
 function Campground() {
   const location = useLocation();
+  const { user } = useContext(AuthContext);
   const [campground, setCampground] = useState(null);
   const [error, setError] = useState(null);
   const { id } = useParams();
@@ -89,6 +88,9 @@ function Campground() {
 
           <div className="px-6 py-3 border-b border-gray-300">
             <h1 className="text-3xl font-bold mb-2">{campground.name}</h1>
+            <p className="italic text-sm mb-2">
+              Submitted by: {campground.author.username}
+            </p>
             <p className="font-semibold tracking-wider">
               {formatMoney(campground.price)}/night
             </p>
@@ -102,20 +104,22 @@ function Campground() {
             <p>{campground.description}</p>
           </div>
 
-          <div className="px-6 py-3 border-b border-gray-300">
-            <Link
-              to={`/campgrounds/${id}/edit`}
-              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 mr-2"
-            >
-              Edit
-            </Link>
-            <button
-              onClick={() => deleteCampground(id)}
-              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-            >
-              Delete
-            </button>
-          </div>
+          {campground.author._id === user?._id && (
+            <div className="px-6 py-3 border-b border-gray-300">
+              <Link
+                to={`/campgrounds/${id}/edit`}
+                className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 mr-2"
+              >
+                Edit
+              </Link>
+              <button
+                onClick={() => deleteCampground(id)}
+                className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                Delete
+              </button>
+            </div>
+          )}
 
           <div className="px-6 py-3">
             <h2 className="text-xl font-bold mb-2">Reviews</h2>
@@ -126,31 +130,36 @@ function Campground() {
             ) : (
               campground.reviews.map((review) => (
                 <div className="mb-2 w-full" key={review._id}>
-                  <div className="flex flex-row w-full mb-1">
+                  <div className="flex flex-row items-center w-full mb-1">
+                    <span className="font-semibold italic mr-3">
+                      {review.author.username}
+                    </span>
                     <span className="inline-block">
                       {Array(review.rating)
                         .fill(0)
                         .map((_, i) => (
-                          <SolidStar
-                            key={`solid-${i}`}
-                            className="h-6 w-6 inline-block"
+                          <StarIcon
+                            key={`filled-${i}`}
+                            className="h-4 w-4 text-yellow-300 inline-block"
                           />
                         ))}
                       {Array(5 - review.rating)
                         .fill(0)
                         .map((_, i) => (
-                          <EmptyStar
-                            key={`solid-${i}`}
-                            className="h-6 w-6 inline-block"
+                          <StarIcon
+                            key={`empty-${i}`}
+                            className="h-4 w-4 text-gray-400 inline-block"
                           />
                         ))}
                     </span>
-                    <button
-                      onClick={() => deleteReview(id, review._id)}
-                      className="inline-block ml-auto justify-center py-1 px-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                    >
-                      <TrashIcon className="h-4 w-4" />
-                    </button>
+                    {user?._id === review.author._id && (
+                      <button
+                        onClick={() => deleteReview(id, review._id)}
+                        className="inline-block ml-auto justify-center py-1 px-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                      >
+                        <TrashIcon className="h-4 w-4" />
+                      </button>
+                    )}
                   </div>
                   <p>{review.body}</p>
                 </div>

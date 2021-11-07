@@ -10,7 +10,7 @@ function FlashWarning({ message }) {
       <div className="text-orange-500 rounded-full bg-white mr-3">
         <ExclamationCircleIcon className="h-7 y-7" />
       </div>
-      <div className="text-white max-w-xs ">{message}</div>
+      <div className="text-white">{message}</div>
       <button
         className="ml-auto text-gray-300 text-lg hover:text-white"
         aria-label="Close"

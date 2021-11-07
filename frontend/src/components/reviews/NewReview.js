@@ -1,10 +1,12 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
+import { AuthContext } from "../../services/auth.context";
 import ReviewsService from "../../services/reviews.service";
 
 function NewReview({ campgroundId }) {
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const {
     register,
@@ -19,6 +21,19 @@ function NewReview({ campgroundId }) {
       state: { type: "success", message: "Your review has been posted!" },
     });
     navigate(0);
+  }
+
+  if (!user) {
+    return (
+      <div className="my-2">
+        <p className="italic">
+          <Link to="/login" className="text-indigo-600 hover:underline">
+            Sign in
+          </Link>{" "}
+          to leave a review!
+        </p>
+      </div>
+    );
   }
 
   return (

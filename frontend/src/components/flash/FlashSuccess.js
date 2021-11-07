@@ -10,7 +10,7 @@ function FlashSuccess({ message }) {
       <div className="text-green-500 rounded-full bg-white mr-3">
         <CheckIcon className="h-7 w-7" />
       </div>
-      <div className="text-white max-w-xs ">{message}</div>
+      <div className="text-white">{message}</div>
       <button
         className="ml-auto text-gray-300 text-lg hover:text-white"
         aria-label="Close"
