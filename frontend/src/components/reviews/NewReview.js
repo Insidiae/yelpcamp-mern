@@ -78,7 +78,7 @@ function NewReview({ campgroundId }) {
             defaultChecked={true}
             {...register("rating")}
           />
-          <label for="rate-5">
+          <label htmlFor="rate-5">
             <StarIcon className="inline-block h-6 w-6" />
           </label>
           <input
@@ -88,7 +88,7 @@ function NewReview({ campgroundId }) {
             value={4}
             {...register("rating")}
           />
-          <label for="rate-4">
+          <label htmlFor="rate-4">
             <StarIcon className="inline-block h-6 w-6" />
           </label>
           <input
@@ -98,7 +98,7 @@ function NewReview({ campgroundId }) {
             value={3}
             {...register("rating")}
           />
-          <label for="rate-3">
+          <label htmlFor="rate-3">
             <StarIcon className="inline-block h-6 w-6" />
           </label>
           <input
@@ -108,7 +108,7 @@ function NewReview({ campgroundId }) {
             value={2}
             {...register("rating")}
           />
-          <label for="rate-2">
+          <label htmlFor="rate-2">
             <StarIcon className="inline-block h-6 w-6" />
           </label>
           <input
@@ -118,7 +118,7 @@ function NewReview({ campgroundId }) {
             value={1}
             {...register("rating")}
           />
-          <label for="rate-1">
+          <label htmlFor="rate-1">
             <StarIcon className="inline-block h-6 w-6" />
           </label>
         </fieldset>

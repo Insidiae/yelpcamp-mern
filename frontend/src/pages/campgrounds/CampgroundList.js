@@ -37,7 +37,7 @@ function CampgroundList() {
               <div className="flex">
                 <img
                   className="w-1/2 rounded-md border-2 object-cover border-gray-300"
-                  src={campground.image}
+                  src={campground.images[0].thumbUrl}
                   alt={campground.name}
                 />
                 <div className="flex flex-col ml-5">

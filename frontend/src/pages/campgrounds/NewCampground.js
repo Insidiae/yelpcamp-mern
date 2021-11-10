@@ -1,8 +1,10 @@
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import axios from "axios";
 
 import CampgroundsService from "../../services/campgrounds.service";
+import ApiService from "../../services/api.service";
 
 function NewCampground() {
   const navigate = useNavigate();
@@ -10,6 +12,7 @@ function NewCampground() {
     register,
     formState: { errors },
     handleSubmit,
+    setError,
   } = useForm();
 
   useEffect(() => {
@@ -17,9 +20,47 @@ function NewCampground() {
   }, []);
 
   async function onSubmit(data) {
-    data.price = data.price * 100;
+    const { imageFiles, ...campgroundData } = data;
 
-    await CampgroundsService.create({ campground: data });
+    for (let imageFile of imageFiles) {
+      if (!imageFile.type.includes("image")) {
+        return setError("imageFile", {
+          type: "manual",
+          message: "Please upload a valid image file.",
+        });
+      }
+    }
+
+    campgroundData.price = campgroundData.price * 100;
+
+    const res = await ApiService.getCloudinaryKeys();
+    const { cloudName } = res.data;
+
+    const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+
+    const uploadedImages = [];
+
+    for (let imageFile of imageFiles) {
+      const uploadBody = new FormData();
+      uploadBody.append("file", imageFile);
+      uploadBody.append("upload_preset", "YelpCamp");
+
+      const uploadRes = await axios.post(url, uploadBody);
+      uploadedImages.push(uploadRes.data);
+    }
+
+    const body = {
+      ...campgroundData,
+      images: uploadedImages.map((img) => {
+        return {
+          url: img.secure_url,
+          thumbUrl: img.eager[0].secure_url,
+          filename: img.public_id,
+        };
+      }),
+    };
+
+    await CampgroundsService.create({ campground: body });
 
     navigate("/campgrounds", {
       state: { type: "success", message: "Added a new campground!" },
@@ -61,21 +102,22 @@ function NewCampground() {
             htmlFor="image"
             className="block text-sm font-medium text-gray-700"
           >
-            Image URL
+            Image
           </label>
           <input
-            type="text"
-            name="image"
-            id="image"
+            type="file"
+            multiple
+            name="imageFiles"
+            id="imageFiles"
+            accept="image/*"
             className={`focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
-              errors.image && "ring-red-500 border-red-500"
+              errors.imageFile && "ring-red-500 border-red-500"
             }`}
-            placeholder="Image URL"
-            {...register("image", { required: true })}
+            {...register("imageFiles", { required: true })}
           />
-          {errors.image && (
+          {errors.imageFile && (
             <span className="text-red-500 font-semibold sm:text-sm">
-              Please enter an image URL.
+              {errors.imageFile.message || "Please upload an image."}
             </span>
           )}
         </div>

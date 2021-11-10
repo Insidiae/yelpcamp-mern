@@ -1,3 +1,7 @@
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
+
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -11,6 +15,7 @@ const User = require("./models/user");
 const usersRoutes = require("./routes/users");
 const campgroundsRoutes = require("./routes/campgrounds");
 const reviewsRoutes = require("./routes/reviews");
+const apiRoutes = require("./routes/api");
 
 //! Might wanna change this when we deploy
 app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
@@ -47,6 +52,7 @@ passport.deserializeUser(User.deserializeUser());
 app.use("/", usersRoutes);
 app.use("/campgrounds", campgroundsRoutes);
 app.use("/campgrounds/:campgroundId/reviews", reviewsRoutes);
+app.use("/api", apiRoutes);
 
 app.use((err, req, res, next) => {
   const { status = 500, message = "Something went wrong :(" } = err;

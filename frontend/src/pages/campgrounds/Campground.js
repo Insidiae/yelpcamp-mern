@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
+import Slider from "react-slick";
 import { LocationMarkerIcon, TrashIcon } from "@heroicons/react/outline";
 import { StarIcon } from "@heroicons/react/solid";
 
@@ -20,6 +21,14 @@ function Campground() {
   const [error, setError] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
+
+  const sliderSettings = {
+    dots: false,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+  };
 
   async function getCampground(id) {
     try {
@@ -80,11 +89,22 @@ function Campground() {
       )}
       <div className="flex flex-col justify-center items-center min-h-full">
         <div className="flex flex-col bg-white border-2 border-gray-300 my-4 rounded-md tracking-wide shadow-lg w-11/12 overflow-hidden md:w-3/4 lg:w-1/2">
-          <img
+          {/* <img
             className="w-full"
             src={campground.image}
             alt={campground.name}
-          />
+          /> */}
+
+          <Slider {...sliderSettings}>
+            {campground.images.map((img) => (
+              <img
+                key={img.filename}
+                className="w-full"
+                src={img.url}
+                alt={campground.name}
+              />
+            ))}
+          </Slider>
 
           <div className="px-6 py-3 border-b border-gray-300">
             <h1 className="text-3xl font-bold mb-2">{campground.name}</h1>

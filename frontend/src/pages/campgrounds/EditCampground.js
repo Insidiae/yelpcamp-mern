@@ -1,19 +1,27 @@
-import React, { useEffect, useCallback, useContext } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import axios from "axios";
+import { TrashIcon } from "@heroicons/react/outline";
 
 import CampgroundsService from "../../services/campgrounds.service";
+import ApiService from "../../services/api.service";
 import { AuthContext } from "../../services/auth.context";
+
+const MAX_IMAGES = 10;
 
 function EditCampground() {
   const { id } = useParams();
   const { user } = useContext(AuthContext);
+  const [images, setImages] = useState([]);
+  const [deletedImages, setDeletedImages] = useState([]);
   const navigate = useNavigate();
   const {
     register,
     formState: { errors },
     handleSubmit,
     setValue,
+    setError,
   } = useForm();
 
   //TODO: Research the proper way to set values in edit form.
@@ -41,8 +49,13 @@ function EditCampground() {
         replace: true,
       });
     }
+    setImages(
+      res.data.images.map((img) => {
+        const { _id, ...rest } = img;
+        return rest;
+      })
+    );
     setValue("name", res.data.name);
-    setValue("image", res.data.image);
     setValue("price", res.data.price / 100);
     setValue("description", res.data.description);
     setValue("location", res.data.location);
@@ -57,14 +70,69 @@ function EditCampground() {
   }, [id, getCampgroundData]);
 
   async function onSubmit(data) {
-    data.price = data.price * 100;
+    const { imageFiles, ...campgroundData } = data;
 
-    await CampgroundsService.edit(id, { campground: data });
+    if (images.length + imageFiles.length > MAX_IMAGES) {
+      return setError("imageFile", {
+        type: "manual",
+        message: `Too many images. Max allowed is ${
+          MAX_IMAGES - images.length
+        }.`,
+      });
+    }
+
+    for (let imageFile of imageFiles) {
+      if (!imageFile.type.includes("image")) {
+        return setError("imageFile", {
+          type: "manual",
+          message: "Please upload a valid image file.",
+        });
+      }
+    }
+
+    campgroundData.price = campgroundData.price * 100;
+
+    const res = await ApiService.getCloudinaryKeys();
+    const { cloudName } = res.data;
+
+    const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+
+    const uploadedImages = [];
+
+    for (let imageFile of imageFiles) {
+      const uploadBody = new FormData();
+      uploadBody.append("file", imageFile);
+      uploadBody.append("upload_preset", "YelpCamp");
+
+      const uploadRes = await axios.post(url, uploadBody);
+      console.log(uploadRes);
+      uploadedImages.push(uploadRes.data);
+    }
+
+    const body = {
+      ...campgroundData,
+      images: images.concat(
+        uploadedImages.map((img) => {
+          return {
+            url: img.secure_url,
+            thumbUrl: img.eager[0].secure_url,
+            filename: img.public_id,
+          };
+        })
+      ),
+    };
+
+    await CampgroundsService.edit(id, { campground: body, deletedImages });
 
     navigate(`/campgrounds/${id}`, {
       state: { type: "info", message: "Campground has been updated." },
       replace: true,
     });
+  }
+
+  function deleteImage(toDelete) {
+    setDeletedImages((prevState) => [...prevState, toDelete]);
+    setImages(images.filter((img) => img.filename !== toDelete.filename));
   }
 
   return (
@@ -97,26 +165,29 @@ function EditCampground() {
             </span>
           )}
         </div>
+
         <div className="my-2">
           <label
             htmlFor="image"
             className="block text-sm font-medium text-gray-700"
           >
-            Image URL
+            Add more images (Max: {MAX_IMAGES - images.length})
           </label>
           <input
-            type="text"
-            name="image"
-            id="image"
+            type="file"
+            multiple
+            name="imageFiles"
+            id="imageFiles"
+            accept="image/*"
+            disabled={images.length >= MAX_IMAGES}
             className={`focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
-              errors.image && "ring-red-500 border-red-500"
+              errors.imageFile && "ring-red-500 border-red-500"
             }`}
-            placeholder="Image URL"
-            {...register("image", { required: true })}
+            {...register("imageFiles")}
           />
-          {errors.image && (
+          {errors.imageFile && (
             <span className="text-red-500 font-semibold sm:text-sm">
-              Please enter an image URL.
+              {errors.imageFile.message || "Please upload an image."}
             </span>
           )}
         </div>
@@ -195,6 +266,21 @@ function EditCampground() {
               Please enter a valid location.
             </span>
           )}
+        </div>
+
+        <div className="my-2">
+          {images.map((img) => (
+            <div key={img.filename} className="inline-block relative mr-2">
+              <img src={img.url} alt="" className="w-20" />
+              <button
+                role="button"
+                className="inline-block absolute top-2 right-2 ml-auto justify-center py-1 px-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                onClick={() => deleteImage(img)}
+              >
+                <TrashIcon className="h-4 w-4" />
+              </button>
+            </div>
+          ))}
         </div>
 
         <div className="my-2">

@@ -1,8 +1,26 @@
+@import "slick-carousel/slick/slick.css";
+@import "slick-carousel/slick/slick-theme.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer components {
+  .slick-arrow {
+    @apply z-10;
+  }
+  .slick-arrow::before {
+    @apply text-gray-300 text-3xl;
+  }
+
+  .slick-prev {
+    left: 5px;
+  }
+
+  .slick-next {
+    right: 15px;
+  }
+
   .star-rating input[type="radio"]:checked ~ label {
     @apply text-yellow-400;
   }
