@@ -79,7 +79,7 @@ function Campground() {
         <Flash type={location.state.type} message={location.state.message} />
       )}
       <div className="flex flex-col justify-center items-center min-h-full">
-        <div className="flex flex-col bg-white border-2 border-gray-300 my-4 rounded-md tracking-wide shadow-lg w-1/2 overflow-hidden">
+        <div className="flex flex-col bg-white border-2 border-gray-300 my-4 rounded-md tracking-wide shadow-lg w-11/12 overflow-hidden md:w-3/4 lg:w-1/2">
           <img
             className="w-full"
             src={campground.image}

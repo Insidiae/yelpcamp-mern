@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { StarIcon } from "@heroicons/react/solid";
 
 import { AuthContext } from "../../services/auth.context";
 import ReviewsService from "../../services/reviews.service";
@@ -68,14 +69,59 @@ function NewReview({ campgroundId }) {
         >
           Rating
         </label>
-        <input
-          name="rating"
-          id="rating"
-          type="range"
-          min="1"
-          max="5"
-          {...register("rating")}
-        />
+        <fieldset className="star-rating">
+          <input
+            type="radio"
+            id="rate-5"
+            name="rating"
+            value={5}
+            defaultChecked={true}
+            {...register("rating")}
+          />
+          <label for="rate-5">
+            <StarIcon className="inline-block h-6 w-6" />
+          </label>
+          <input
+            type="radio"
+            id="rate-4"
+            name="rating"
+            value={4}
+            {...register("rating")}
+          />
+          <label for="rate-4">
+            <StarIcon className="inline-block h-6 w-6" />
+          </label>
+          <input
+            type="radio"
+            id="rate-3"
+            name="rating"
+            value={3}
+            {...register("rating")}
+          />
+          <label for="rate-3">
+            <StarIcon className="inline-block h-6 w-6" />
+          </label>
+          <input
+            type="radio"
+            id="rate-2"
+            name="rating"
+            value={2}
+            {...register("rating")}
+          />
+          <label for="rate-2">
+            <StarIcon className="inline-block h-6 w-6" />
+          </label>
+          <input
+            type="radio"
+            id="rate-1"
+            name="rating"
+            value={1}
+            {...register("rating")}
+          />
+          <label for="rate-1">
+            <StarIcon className="inline-block h-6 w-6" />
+          </label>
+        </fieldset>
       </div>
       <button
         type="submit"

@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .star-rating input[type="radio"]:checked ~ label {
+    @apply text-yellow-400;
+  }
+  .star-rating input[type="radio"] {
+    display: none;
+  }
+  .star-rating label {
+    @apply text-gray-400;
+  }
+  .star-rating label:hover,
+  .star-rating label:hover ~ label {
+    @apply text-yellow-200;
+  }
+
+  .star-rating {
+    display: flex;
+    justify-content: flex-end;
+    transform: scaleX(-1);
+  }
+}
