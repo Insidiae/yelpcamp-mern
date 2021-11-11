@@ -37,6 +37,15 @@ module.exports.showCampground = async (req, res, next) => {
 };
 
 module.exports.updateCampground = async (req, res, next) => {
+  const geoData = await geocodingClient
+    .forwardGeocode({
+      query: req.body.campground.location,
+      limit: 1,
+    })
+    .send();
+
+  req.body.campground.geometry = geoData.body.features[0].geometry;
+
   const { id } = req.params;
   if (req.body.deletedImages) {
     for (let img of req.body.deletedImages) {

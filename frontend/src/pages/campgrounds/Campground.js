@@ -62,6 +62,8 @@ function Campground() {
         zoom: 9,
       });
 
+      map.current.addControl(new mapboxgl.NavigationControl());
+
       new mapboxgl.Marker()
         .setLngLat(coords)
         .setPopup(

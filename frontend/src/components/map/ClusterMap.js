@@ -134,6 +134,8 @@ export default function ClusterMap({ data }) {
         map.current.getCanvas().style.cursor = "";
       });
     });
+
+    map.current.addControl(new mapboxgl.NavigationControl());
   }
 
   useEffect(() => {
