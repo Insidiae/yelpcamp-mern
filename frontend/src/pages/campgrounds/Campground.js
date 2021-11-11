@@ -1,9 +1,17 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useRef,
+  useCallback,
+} from "react";
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
+import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
 import Slider from "react-slick";
 import { LocationMarkerIcon, TrashIcon } from "@heroicons/react/outline";
 import { StarIcon } from "@heroicons/react/solid";
 
+import ApiService from "../../services/api.service";
 import CampgroundsService from "../../services/campgrounds.service";
 import ReviewsService from "../../services/reviews.service";
 
@@ -14,6 +22,9 @@ import { AuthContext } from "../../services/auth.context";
 
 import { formatMoney } from "../../utils/formatMoney";
 
+// mapboxgl.accessToken =
+//   "pk.eyJ1IjoiaW5zaWRpYWUiLCJhIjoiY2t2dXgzZ2ZtMGJueDJwbXJkY25zODBmZyJ9.5vu9h2K6U73778hjNDYSeA";
+
 function Campground() {
   const location = useLocation();
   const { user } = useContext(AuthContext);
@@ -21,6 +32,9 @@ function Campground() {
   const [error, setError] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
+
+  const mapContainer = useRef(null);
+  const map = useRef(null);
 
   const sliderSettings = {
     dots: false,
@@ -30,14 +44,51 @@ function Campground() {
     slidesToScroll: 1,
   };
 
-  async function getCampground(id) {
+  const getCampground = useCallback(async (id) => {
     try {
       const res = await CampgroundsService.get(id);
       setCampground(res.data);
+      const coords = res.data.geometry.coordinates;
+      if (map.current) return; // initialize map only once
+
+      const mapRes = await ApiService.getMapboxToken();
+      const { token } = mapRes.data;
+
+      mapboxgl.accessToken = token;
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: "mapbox://styles/mapbox/outdoors-v11",
+        center: coords,
+        zoom: 9,
+      });
+
+      new mapboxgl.Marker()
+        .setLngLat(coords)
+        .setPopup(
+          new mapboxgl.Popup({ offset: 25 }).setHTML(
+            `<h3 class="text-base font-bold">${res.data.name}</h3><p>${res.data.location}</p>`
+          )
+        )
+        .addTo(map.current);
     } catch (err) {
       setError(err.response.data);
     }
-  }
+  }, []);
+
+  // const setupMapbox = useCallback(async () => {
+  //   if (map.current) return; // initialize map only once
+  //   console.log(map.current, mapContainer.current);
+  //   const res = await ApiService.getMapboxToken();
+  //   const { token } = res.data;
+
+  //   mapboxgl.accessToken = token;
+  //   map.current = new mapboxgl.Map({
+  //     container: mapContainer.current,
+  //     style: "mapbox://styles/mapbox/streets-v11",
+  //     center: [lng, lat],
+  //     zoom: zoom,
+  //   });
+  // }, [lat, lng, zoom]);
 
   async function deleteCampground(id) {
     await CampgroundsService.delete(id);
@@ -61,7 +112,21 @@ function Campground() {
 
   useEffect(() => {
     getCampground(id);
-  }, [id]);
+  }, [id, getCampground]);
+
+  // useEffect(() => {
+  //   setupMapbox();
+  // }, [setupMapbox]);
+
+  // useEffect(() => {
+  //   if (map.current || !mapContainer.current) return; // initialize map only once
+  //   map.current = new mapboxgl.Map({
+  //     container: mapContainer.current,
+  //     style: "mapbox://styles/mapbox/streets-v11",
+  //     center: [lng, lat],
+  //     zoom: zoom,
+  //   });
+  // });
 
   useEffect(() => {
     if (campground) {
@@ -117,11 +182,15 @@ function Campground() {
           </div>
 
           <div className="px-6 py-3 border-b border-gray-300">
+            <p className="mb-3">{campground.description}</p>
             <div className="flex mb-3">
               <LocationMarkerIcon className="h-6 w-6 mr-2" />
               <p>{campground.location}</p>
             </div>
-            <p>{campground.description}</p>
+
+            <div>
+              <div ref={mapContainer} className="map-container w-full h-96" />
+            </div>
           </div>
 
           {campground.author._id === user?._id && (

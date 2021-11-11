@@ -9,4 +9,10 @@ router.get("/cloudinary", (req, res) => {
   });
 });
 
+router.get("/mapbox", (req, res) => {
+  res.json({
+    token: process.env.MAPBOX_TOKEN,
+  });
+});
+
 module.exports = router;

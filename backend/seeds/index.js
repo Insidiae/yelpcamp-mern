@@ -33,6 +33,13 @@ const seedDB = async () => {
       description:
         "Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam delectus odio eligendi quasi.",
       location: `${cities[random1000].city}, ${cities[random1000].state}`,
+      geometry: {
+        type: "Point",
+        coordinates: [
+          cities[random1000].longitude,
+          cities[random1000].latitude,
+        ],
+      },
       author: "61880c2ad3ca744b5d0ea878",
     });
     await c.save();

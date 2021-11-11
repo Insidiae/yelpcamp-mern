@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { LocationMarkerIcon } from "@heroicons/react/outline";
 
 import Flash from "../../components/flash";
+import ClusterMap from "../../components/map/ClusterMap";
 
 import CampgroundsService from "../../services/campgrounds.service";
 import { formatMoney } from "../../utils/formatMoney";
@@ -26,6 +27,7 @@ function CampgroundList() {
       {location.state?.message && (
         <Flash type={location.state.type} message={location.state.message} />
       )}
+      {campgrounds.length && <ClusterMap data={{ features: campgrounds }} />}
       <div className="flex flex-col items-center min-h-screen py-4">
         <h1 className="text-3xl font-bold py-5">Campgrounds</h1>
         <ul className="flex flex-col items-center">
