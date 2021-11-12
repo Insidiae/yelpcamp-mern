@@ -67,6 +67,7 @@ const sessionOptions = {
     maxAge: 1000 * 60 * 60 * 24 * 7,
   },
 };
+app.set("trust proxy", 1);
 app.use(session(sessionOptions));
 
 app.use(passport.initialize());
