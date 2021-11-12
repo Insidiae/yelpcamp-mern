@@ -21,7 +21,12 @@ const reviewsRoutes = require("./routes/reviews");
 const apiRoutes = require("./routes/api");
 
 //! Might wanna change this when we deploy
-app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
+app.use(
+  cors({
+    credentials: true,
+    origin: "https://focused-davinci-28075a.netlify.app/",
+  })
+);
 app.use(express.json());
 app.use(mongoSanitize({ replaceWith: "_" }));
 
