@@ -9,6 +9,8 @@ const cors = require("cors");
 const session = require("express-session");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
+const mongoSanitize = require("express-mongo-sanitize");
+const helmet = require("helmet");
 
 const User = require("./models/user");
 
@@ -20,6 +22,7 @@ const apiRoutes = require("./routes/api");
 //! Might wanna change this when we deploy
 app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 app.use(express.json());
+app.use(mongoSanitize({ replaceWith: "_" }));
 
 mongoose
   .connect("mongodb://127.0.0.1:27017/yelp-camp")
@@ -31,11 +34,13 @@ mongoose
   });
 
 const sessionOptions = {
+  name: "yelpcamp_session",
   secret: "thisshouldbeabettersecret!",
   resave: false,
-  saveUnitialized: true,
+  saveUninitialized: true,
   cookie: {
     httpOnly: true,
+    // secure: true,
     expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
     maxAge: 1000 * 60 * 60 * 24 * 7,
   },
@@ -44,6 +49,7 @@ app.use(session(sessionOptions));
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(helmet());
 passport.use(new LocalStrategy(User.authenticate()));
 
 passport.serializeUser(User.serializeUser());

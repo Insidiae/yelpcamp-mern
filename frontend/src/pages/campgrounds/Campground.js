@@ -22,9 +22,6 @@ import { AuthContext } from "../../services/auth.context";
 
 import { formatMoney } from "../../utils/formatMoney";
 
-// mapboxgl.accessToken =
-//   "pk.eyJ1IjoiaW5zaWRpYWUiLCJhIjoiY2t2dXgzZ2ZtMGJueDJwbXJkY25zODBmZyJ9.5vu9h2K6U73778hjNDYSeA";
-
 function Campground() {
   const location = useLocation();
   const { user } = useContext(AuthContext);
@@ -77,21 +74,6 @@ function Campground() {
     }
   }, []);
 
-  // const setupMapbox = useCallback(async () => {
-  //   if (map.current) return; // initialize map only once
-  //   console.log(map.current, mapContainer.current);
-  //   const res = await ApiService.getMapboxToken();
-  //   const { token } = res.data;
-
-  //   mapboxgl.accessToken = token;
-  //   map.current = new mapboxgl.Map({
-  //     container: mapContainer.current,
-  //     style: "mapbox://styles/mapbox/streets-v11",
-  //     center: [lng, lat],
-  //     zoom: zoom,
-  //   });
-  // }, [lat, lng, zoom]);
-
   async function deleteCampground(id) {
     await CampgroundsService.delete(id);
 
@@ -115,20 +97,6 @@ function Campground() {
   useEffect(() => {
     getCampground(id);
   }, [id, getCampground]);
-
-  // useEffect(() => {
-  //   setupMapbox();
-  // }, [setupMapbox]);
-
-  // useEffect(() => {
-  //   if (map.current || !mapContainer.current) return; // initialize map only once
-  //   map.current = new mapboxgl.Map({
-  //     container: mapContainer.current,
-  //     style: "mapbox://styles/mapbox/streets-v11",
-  //     center: [lng, lat],
-  //     zoom: zoom,
-  //   });
-  // });
 
   useEffect(() => {
     if (campground) {
@@ -156,12 +124,6 @@ function Campground() {
       )}
       <div className="flex flex-col justify-center items-center min-h-full">
         <div className="flex flex-col bg-white border-2 border-gray-300 my-4 rounded-md tracking-wide shadow-lg w-11/12 overflow-hidden md:w-3/4 lg:w-1/2">
-          {/* <img
-            className="w-full"
-            src={campground.image}
-            alt={campground.name}
-          /> */}
-
           <Slider {...sliderSettings}>
             {campground.images.map((img) => (
               <img
