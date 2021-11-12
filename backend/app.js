@@ -71,7 +71,7 @@ app.use(session(sessionOptions));
 
 app.use(passport.initialize());
 app.use(passport.session());
-// app.use(helmet());
+app.use(helmet());
 passport.use(new LocalStrategy(User.authenticate()));
 
 passport.serializeUser(User.serializeUser());
