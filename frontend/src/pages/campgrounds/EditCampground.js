@@ -135,6 +135,7 @@ function EditCampground() {
     setImages(images.filter((img) => img.filename !== toDelete.filename));
   }
 
+  /* eslint-disable jsx-a11y/no-redundant-roles */
   return (
     <div className="flex flex-col justify-center items-center min-h-full">
       <h1 className="text-3xl font-bold py-5">Edit Campground</h1>

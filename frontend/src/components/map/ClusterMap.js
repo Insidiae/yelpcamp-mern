@@ -140,7 +140,7 @@ export default function ClusterMap({ data }) {
 
   useEffect(() => {
     initializeMapbox();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div>
