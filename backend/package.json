@@ -4,7 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "KB Ruado",
@@ -12,6 +13,7 @@
   "dependencies": {
     "@mapbox/mapbox-sdk": "^0.13.2",
     "cloudinary": "^1.27.1",
+    "connect-mongo": "^4.6.0",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
