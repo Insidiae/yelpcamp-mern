@@ -24,7 +24,7 @@ const apiRoutes = require("./routes/api");
 app.use(
   cors({
     credentials: true,
-    origin: "https://focused-davinci-28075a.netlify.app/",
+    origin: process.env.FRONTEND_URL,
   })
 );
 app.use(express.json());
